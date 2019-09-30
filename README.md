@@ -1,8 +1,6 @@
 # aeson-yaml
 
-BSD3-licensed library to encode any Aeson value as YAML, without a
-dependency on an external YAML library like `yaml` (libyaml C FFI) or
-`HsYaml` (GPL).
+BSD3-licensed, pure Haskell library to encode any Aeson value as YAML.
 
 ## Usage
 
@@ -30,3 +28,11 @@ using this library.
 ## License
 
 [BSD3](LICENSE)
+
+## Motivation
+
+This library does not depend on any external YAML library with C bindings,
+like `yaml`, or a restrictive license, like `HsYaml` (GPLv3). Note, though,
+that this library can only be used for encoding, not decoding.
+
+This library also works with GHCJS and Eta.
