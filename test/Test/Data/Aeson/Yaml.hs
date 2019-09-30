@@ -34,6 +34,7 @@ testCases =
       , tcInput =
           [s|
 {
+   "nullValue": null,
    "apiVersion": "apps/v1",
    "kind": "Deployment",
    "metadata": {
@@ -94,6 +95,7 @@ metadata:
   labels:
     app: "foo"
   name: "{{ .Release.Name }}-deployment"
+nullValue: null
 spec:
   replicas: 1
   selector:
