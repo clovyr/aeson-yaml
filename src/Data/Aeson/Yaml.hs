@@ -8,7 +8,6 @@ libyaml. It is also licensed under the BSD3 license.
 
 This module is meant to be imported qualified.
 -}
-
 {-# LANGUAGE OverloadedStrings #-}
 
 module Data.Aeson.Yaml
@@ -24,8 +23,7 @@ import qualified Data.ByteString.Builder as ByteString.Builder
 import qualified Data.ByteString.Lazy as ByteString.Lazy
 import qualified Data.ByteString.Short as ByteString.Short
 import qualified Data.HashMap.Strict as HashMap
-import Data.List (sortOn)
-import Data.List (intersperse)
+import Data.List (intersperse, sortOn)
 import Data.Monoid ((<>), mconcat, mempty)
 import qualified Data.Text.Encoding as Text.Encoding
 import qualified Data.Vector as Vector
