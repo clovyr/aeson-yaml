@@ -35,6 +35,8 @@ testCases =
           [s|
 {
    "nullValue": null,
+   "isTrue": true,
+   "isFalse": false,
    "apiVersion": "apps/v1",
    "kind": "Deployment",
    "metadata": {
@@ -90,6 +92,8 @@ testCases =
 |]
       , tcOutput =
           [s|apiVersion: "apps/v1"
+isFalse: false
+isTrue: true
 kind: "Deployment"
 metadata:
   labels:
