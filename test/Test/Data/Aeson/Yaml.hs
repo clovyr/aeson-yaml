@@ -42,6 +42,8 @@ testCases =
    "quoted ! key": true,
    "ON": "ON",
    "off": "off",
+   "piString": "3.14",
+   "expString": "1e3",
    "apiVersion": "apps/v1",
    "kind": "Deployment",
    "metadata": {
@@ -98,6 +100,7 @@ testCases =
       , tcOutput =
           [s|"ON": "ON"
 apiVersion: apps/v1
+expString: "1e3"
 isFalse: false
 isTrue: true
 kind: Deployment
@@ -108,6 +111,7 @@ metadata:
 nullValue: null
 numberString: "12345"
 "off": "off"
+piString: "3.14"
 "quoted ! key": true
 spec:
   replicas: 1
