@@ -40,6 +40,8 @@ testCases =
    "isFalse": false,
    "numberString": "12345",
    "quoted ! key": true,
+   "ON": "ON",
+   "off": "off",
    "apiVersion": "apps/v1",
    "kind": "Deployment",
    "metadata": {
@@ -94,7 +96,8 @@ testCases =
 }
 |]
       , tcOutput =
-          [s|apiVersion: apps/v1
+          [s|"ON": "ON"
+apiVersion: apps/v1
 isFalse: false
 isTrue: true
 kind: Deployment
@@ -104,6 +107,7 @@ metadata:
   name: "{{ .Release.Name }}-deployment"
 nullValue: null
 numberString: "12345"
+"off": "off"
 "quoted ! key": true
 spec:
   replicas: 1

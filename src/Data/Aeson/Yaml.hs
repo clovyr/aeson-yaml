@@ -116,8 +116,22 @@ encodeText alwaysQuote s
   where
     unquotable =
       s /= "" &&
+      (not $ isSpecial s) &&
       isSafeAscii (Text.head s) &&
       not (Text.all isDigit s) && Text.all isAllowed s
+    isSpecial s'
+      | Text.length s > 5 = False
+      | otherwise =
+        case Text.toLower s' of
+          "true" -> True
+          "false" -> True
+          "on" -> True
+          "off" -> True
+          "y" -> True
+          "yes" -> True
+          "n" -> True
+          "no" -> True
+          _ -> False
     isSafeAscii c =
       (c >= 'a' && c <= 'z') ||
       (c >= 'A' && c <= 'Z') ||
