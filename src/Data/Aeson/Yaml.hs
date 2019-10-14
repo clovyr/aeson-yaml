@@ -13,6 +13,8 @@ This module is meant to be imported qualified.
 module Data.Aeson.Yaml
   ( encode
   , encodeDocuments
+  , encodeQuoted
+  , encodeQuotedDocuments
   ) where
 
 import Data.Aeson hiding (encode)
@@ -22,9 +24,12 @@ import Data.ByteString.Builder (Builder)
 import qualified Data.ByteString.Builder as ByteString.Builder
 import qualified Data.ByteString.Lazy as ByteString.Lazy
 import qualified Data.ByteString.Short as ByteString.Short
+import Data.Char (isDigit)
 import qualified Data.HashMap.Strict as HashMap
 import Data.List (intersperse, sortOn)
 import Data.Monoid ((<>), mconcat, mempty)
+import qualified Data.Text as Text
+import Data.Text (Text)
 import qualified Data.Text.Encoding as Text.Encoding
 import qualified Data.Vector as Vector
 
@@ -46,7 +51,8 @@ enc = Data.Aeson.encode
 
 -- | Encode a value as YAML (lazy bytestring).
 encode :: ToJSON a => a -> ByteString.Lazy.ByteString
-encode = ByteString.Builder.toLazyByteString . encodeBuilder False 0 . toJSON
+encode =
+  ByteString.Builder.toLazyByteString . encodeBuilder False False 0 . toJSON
 
 -- | Encode multiple values separated by '---'. To encode values of different
 -- types, @import Data.Aeson(ToJSON(toJSON))@ and do
@@ -54,10 +60,25 @@ encode = ByteString.Builder.toLazyByteString . encodeBuilder False 0 . toJSON
 encodeDocuments :: ToJSON a => [a] -> ByteString.Lazy.ByteString
 encodeDocuments =
   ByteString.Builder.toLazyByteString .
-  mconcat . intersperse (bs "\n---\n") . map ((encodeBuilder False 0) . toJSON)
+  mconcat .
+  intersperse (bs "\n---\n") . map ((encodeBuilder False False 0) . toJSON)
 
-encodeBuilder :: Bool -> Int -> Data.Aeson.Value -> Builder
-encodeBuilder newlineBeforeObject level value =
+-- | Encode a value as YAML (lazy bytestring). Strings (scalars) are always
+-- quoted.
+encodeQuoted :: ToJSON a => a -> ByteString.Lazy.ByteString
+encodeQuoted =
+  ByteString.Builder.toLazyByteString . encodeBuilder True False 0 . toJSON
+
+-- | Encode multiple values separated by '---'. Strings (scalars) are always
+-- quoted.
+encodeQuotedDocuments :: ToJSON a => [a] -> ByteString.Lazy.ByteString
+encodeQuotedDocuments =
+  ByteString.Builder.toLazyByteString .
+  mconcat .
+  intersperse (bs "\n---\n") . map ((encodeBuilder True False 0) . toJSON)
+
+encodeBuilder :: Bool -> Bool -> Int -> Data.Aeson.Value -> Builder
+encodeBuilder alwaysQuote newlineBeforeObject level value =
   case value of
     Object hm ->
       mconcat $
@@ -70,20 +91,37 @@ encodeBuilder newlineBeforeObject level value =
       mconcat $
       (prefix :) $
       intersperse prefix $
-      map (encodeBuilder False (level + 1)) (Vector.toList vec)
+      map (encodeBuilder alwaysQuote False (level + 1)) (Vector.toList vec)
       where prefix = bs "\n" <> indent level <> bs "- "
-    String s -> bl (enc s)
+    String s -> encodeText alwaysQuote s
     Number n -> bl (enc n)
     Bool bool -> bl (enc bool)
     Null -> bs "null"
   where
     keyValue level' (k, v) =
       mconcat
-        [ b (Text.Encoding.encodeUtf8 k)
+        [ encodeText alwaysQuote k
         , ":"
         , case v of
             Object _ -> ""
             Array _ -> ""
             _ -> " "
-        , encodeBuilder True (level' + 1) v
+        , encodeBuilder alwaysQuote True (level' + 1) v
         ]
+
+encodeText :: Bool -> Text -> Builder
+encodeText alwaysQuote s
+  | alwaysQuote || not unquotable = bl $ enc s
+  | otherwise = b (Text.Encoding.encodeUtf8 s)
+  where
+    unquotable =
+      s /= "" &&
+      isSafeAscii (Text.head s) &&
+      not (Text.all isDigit s) && Text.all isAllowed s
+    isSafeAscii c =
+      (c >= 'a' && c <= 'z') ||
+      (c >= 'A' && c <= 'Z') ||
+      (c >= '0' && c <= '9') || c == '/' || c == '_' || c == '.' || c == '='
+    isAllowed c
+      -- We don't include ' ' here to avoid sequences like " -" and ": "
+     = isSafeAscii c || c == '-' || c == ':'

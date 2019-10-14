@@ -18,13 +18,14 @@ import qualified Data.Yaml
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
 
-import qualified Data.Aeson.Yaml
+import Data.Aeson.Yaml
 
 data TestCase =
   TestCase
     { tcName :: String
     , tcInput :: Data.ByteString.Lazy.ByteString
     , tcOutput :: Data.ByteString.Lazy.ByteString
+    , tcAlwaysQuote :: Bool
     }
 
 testCases :: [TestCase]
@@ -37,6 +38,8 @@ testCases =
    "nullValue": null,
    "isTrue": true,
    "isFalse": false,
+   "numberString": "12345",
+   "quoted ! key": true,
    "apiVersion": "apps/v1",
    "kind": "Deployment",
    "metadata": {
@@ -91,39 +94,50 @@ testCases =
 }
 |]
       , tcOutput =
-          [s|apiVersion: "apps/v1"
+          [s|apiVersion: apps/v1
 isFalse: false
 isTrue: true
-kind: "Deployment"
+kind: Deployment
 metadata:
   labels:
-    app: "foo"
+    app: foo
   name: "{{ .Release.Name }}-deployment"
 nullValue: null
+numberString: "12345"
+"quoted ! key": true
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "foo"
+      app: foo
   template:
     metadata:
       labels:
-        app: "foo"
+        app: foo
       name: "{{ .Release.Name }}-pod"
     spec:
       containers:
         - command:
-            - "/data/bin/foo"
+            - /data/bin/foo
             - "--port=7654"
-          image: "ubuntu:latest"
+          image: ubuntu:latest
           name: "{{ .Release.Name }}-container"
           ports:
             - containerPort: 7654
           volumeMounts:
-            - mountPath: "/data/mount1"
+            - mountPath: /data/mount1
               name: "{{ .Release.Name }}-volume-mount1"
-            - mountPath: "/data/mount2"
+            - mountPath: /data/mount2
               name: "{{ .Release.Name }}-volume-mount2"|]
+      , tcAlwaysQuote = False
+      }
+  , TestCase
+      { tcName = "Quoted"
+      , tcInput = [s|{"foo": "bar", "baz": "quux"}|]
+      , tcOutput =
+          [s|"baz": "quux"
+"foo": "bar"|]
+      , tcAlwaysQuote = True
       }
   ]
 
@@ -140,12 +154,21 @@ test_testCases = testGroup "Test Cases" $ map mkTestCase testCases
           "libyaml decodes the original value"
           decodedInput
           decodedYaml
-        assertEqual
-          "Expected documents output"
-          ("foo: \"bar\"" <> "\n---\n" <> output)
-          (Data.Aeson.Yaml.encodeDocuments [foo, decodedInput])
+        if tcAlwaysQuote
+          then assertEqual
+                 "Expected documents output"
+                 ("\"foo\": \"bar\"" <> "\n---\n" <> output)
+                 (encodeQuotedDocuments [foo, decodedInput])
+          else assertEqual
+                 "Expected documents output"
+                 ("foo: bar" <> "\n---\n" <> output)
+                 (encodeDocuments [foo, decodedInput])
       where
-        output = Data.Aeson.Yaml.encode decodedInput
+        output =
+          (if tcAlwaysQuote
+             then encodeQuoted
+             else encode)
+            decodedInput
         decodedInput :: Data.Aeson.Value
         decodedInput =
           fromRight (error "couldn't decode JSON") $
