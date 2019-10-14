@@ -118,7 +118,7 @@ encodeText alwaysQuote s
       s /= "" &&
       (not $ isSpecial s) &&
       isSafeAscii (Text.head s) &&
-      not (Text.all isDigit s) && Text.all isAllowed s
+      not (Text.all isNumberRelated s) && Text.all isAllowed s
     isSpecial s'
       | Text.length s > 5 = False
       | otherwise =
@@ -136,6 +136,7 @@ encodeText alwaysQuote s
       (c >= 'a' && c <= 'z') ||
       (c >= 'A' && c <= 'Z') ||
       (c >= '0' && c <= '9') || c == '/' || c == '_' || c == '.' || c == '='
+    isNumberRelated c = isDigit c || c == '.' || c == 'e'
     isAllowed c
       -- We don't include ' ' here to avoid sequences like " -" and ": "
      = isSafeAscii c || c == '-' || c == ':'
