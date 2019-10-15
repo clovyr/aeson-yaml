@@ -150,7 +150,8 @@ spec:
             - mountPath: /data/mount1
               name: "{{ .Release.Name }}-volume-mount1"
             - mountPath: /data/mount2
-              name: "{{ .Release.Name }}-volume-mount2"|]
+              name: "{{ .Release.Name }}-volume-mount2"
+|]
       , tcAlwaysQuote = False
       }
   , TestCase
@@ -158,7 +159,8 @@ spec:
       , tcInput = [s|{"foo": "bar", "baz": "quux"}|]
       , tcOutput =
           [s|"baz": "quux"
-"foo": "bar"|]
+"foo": "bar"
+|]
       , tcAlwaysQuote = True
       }
   ]
