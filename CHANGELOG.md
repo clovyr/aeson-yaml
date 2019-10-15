@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2.0 - 2019-10-15
+
+### Changed
+
+  - Only quote YAML 1.2 boolean strings "true" and "false" (upper or
+    lowercase), not "on", "off", "yes", "y", "no", "n" (if you want to quote
+    these strings, use `encodeQuoted`.
+
 ## 1.0.1.0 - 2019-10-15
 
 ### Added
