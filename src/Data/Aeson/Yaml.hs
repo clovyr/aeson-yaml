@@ -121,13 +121,13 @@ encodeText canMultiline alwaysQuote level s
   where
     unquotable =
       s /= "" &&
-      (not $ isSpecial s) &&
+      not isSpecial &&
       isSafeAscii (Text.head s) &&
       not (Text.all isNumberRelated s) && Text.all isAllowed s
-    isSpecial s'
+    isSpecial
       | Text.length s > 5 = False
       | otherwise =
-        case Text.toLower s' of
+        case Text.toLower s of
           "true" -> True
           "false" -> True
           "on" -> True
