@@ -130,12 +130,6 @@ encodeText canMultiline alwaysQuote level s
         case Text.toLower s of
           "true" -> True
           "false" -> True
-          "on" -> True
-          "off" -> True
-          "y" -> True
-          "yes" -> True
-          "n" -> True
-          "no" -> True
           _ -> False
     isSafeAscii c =
       (c >= 'a' && c <= 'z') ||
