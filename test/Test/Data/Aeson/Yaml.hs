@@ -40,8 +40,7 @@ testCases =
    "isFalse": false,
    "numberString": "12345",
    "quoted ! key": true,
-   "ON": "ON",
-   "off": "off",
+   "boolString": "true",
    "piString": "3.14",
    "expString": "1e3",
    "multiLine": "The first line is followed by the\nsecond line\n",
@@ -102,8 +101,8 @@ testCases =
 }
 |]
       , tcOutput =
-          [s|"ON": "ON"
-apiVersion: apps/v1
+          [s|apiVersion: apps/v1
+boolString: "true"
 expString: "1e3"
 isFalse: false
 isTrue: true
@@ -121,7 +120,6 @@ multiLineWithSpaces: |2
 notMultiline: "This won't be\nmulti-lined"
 nullValue: null
 numberString: "12345"
-"off": "off"
 piString: "3.14"
 "quoted ! key": true
 spec:
