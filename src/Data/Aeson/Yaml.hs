@@ -52,7 +52,7 @@ encode v =
   ByteString.Builder.toLazyByteString $
   encodeBuilder False False 0 (toJSON v) <> bs "\n"
 
--- | Encode multiple values separated by '---'. To encode values of different
+-- | Encode multiple values separated by '\n---\n'. To encode values of different
 -- types, @import Data.Aeson(ToJSON(toJSON))@ and do
 -- @encodeDocuments [toJSON x, toJSON y, toJSON z]@.
 encodeDocuments :: ToJSON a => [a] -> ByteString.Lazy.ByteString
@@ -62,14 +62,14 @@ encodeDocuments vs = ByteString.Builder.toLazyByteString $ output <> bs "\n"
       mconcat $
       intersperse (bs "\n---\n") $ map (encodeBuilder False False 0 . toJSON) vs
 
--- | Encode a value as YAML (lazy bytestring). Strings (scalars) are always
+-- | Encode a value as YAML (lazy bytestring). Keys and strings are always
 -- quoted.
 encodeQuoted :: ToJSON a => a -> ByteString.Lazy.ByteString
 encodeQuoted v =
   ByteString.Builder.toLazyByteString $
   encodeBuilder True False 0 (toJSON v) <> bs "\n"
 
--- | Encode multiple values separated by '---'. Strings (scalars) are always
+-- | Encode multiple values separated by '\n---\n'. Keys and strings are always
 -- quoted.
 encodeQuotedDocuments :: ToJSON a => [a] -> ByteString.Lazy.ByteString
 encodeQuotedDocuments vs =
