@@ -158,8 +158,8 @@ spec:
       { tcName = "Quoted"
       , tcInput = [s|{"foo": "bar", "baz": "quux"}|]
       , tcOutput =
-          [s|"baz": 'quux'
-"foo": 'bar'
+          [s|'baz': 'quux'
+'foo': 'bar'
 |]
       , tcAlwaysQuote = True
       }
@@ -181,7 +181,7 @@ test_testCases = testGroup "Test Cases" $ map mkTestCase testCases
         if tcAlwaysQuote
           then assertEqual
                  "Expected documents output"
-                 ("\"foo\": \"bar\"" <> "\n---\n" <> output)
+                 ("'foo': 'bar'" <> "\n---\n" <> output)
                  (encodeQuotedDocuments [foo, decodedInput])
           else assertEqual
                  "Expected documents output"
