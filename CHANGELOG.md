@@ -1,13 +1,20 @@
-# 1.0.1.0
+# Changelog
 
-Simple strings (scalars) are now output unquoted.
+## 1.0.1.0 - 2019-10-15
 
-Multi-line strings are now output as literal block scalars.
+### Added
 
-Added:
-  - encodeQuoted: Encodes with all keys/strings quoted
-  - encodeQuotedDocuments: Encodes documents with all keys/strings quoted
+  - `encodeQuoted`: Encodes with all keys/strings quoted
+  - `encodeQuotedDocuments`: Encodes documents with all keys/strings quoted
 
-# 1.0.0.0
+### Changed
+
+  - Simple strings (scalars) are now written unquoted.
+
+  - Multi-line strings (with trailing newlines) are now written as literal
+    block scalars.
+
+
+## 1.0.0.0 - 2019-09-30
 
 Initial version
