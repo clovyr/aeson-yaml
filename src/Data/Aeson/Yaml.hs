@@ -46,9 +46,6 @@ indent :: Int -> Builder
 indent 0 = mempty
 indent n = bs "  " <> (indent $! n - 1)
 
-enc :: ToJSON a => a -> ByteString.Lazy.ByteString
-enc = Data.Aeson.encode
-
 -- | Encode a value as YAML (lazy bytestring).
 encode :: ToJSON a => a -> ByteString.Lazy.ByteString
 encode v =
@@ -99,8 +96,8 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
       map (encodeBuilder alwaysQuote False (level + 1)) (Vector.toList vec)
       where prefix = bs "\n" <> indent level <> bs "- "
     String s -> encodeText True alwaysQuote level s
-    Number n -> bl (enc n)
-    Bool bool -> bl (enc bool)
+    Number n -> bl (Data.Aeson.encode n)
+    Bool bool -> bl (Data.Aeson.encode bool)
     Null -> bs "null"
   where
     keyValue level' (k, v) =
@@ -117,7 +114,7 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
 encodeText :: Bool -> Bool -> Int -> Text -> Builder
 encodeText canMultiline alwaysQuote level s
   | canMultiline && "\n" `Text.isSuffixOf` s = encodeLines level (Text.lines s)
-  | alwaysQuote || not unquotable = bl $ enc s
+  | alwaysQuote || not unquotable = bl $ Data.Aeson.encode s
   | otherwise = b (Text.Encoding.encodeUtf8 s)
   where
     unquotable =
