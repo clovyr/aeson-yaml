@@ -45,7 +45,7 @@ testCases =
    "piString": "3.14",
    "expString": "1e3",
    "multiLine": "The first line is followed by the\nsecond line\n",
-   "multiLineWithSpaces": "  This has\nextra spaces at the beginning\n",
+   "multiLineWithSpaces": "         This has extra\n     spaces at the beginning\n",
    "notMultiline": "This won't be\nmulti-lined",
    "apiVersion": "apps/v1",
    "kind": "Deployment",
@@ -116,8 +116,8 @@ multiLine: |
   The first line is followed by the
   second line
 multiLineWithSpaces: |2
-    This has
-  extra spaces at the beginning
+           This has extra
+       spaces at the beginning
 notMultiline: "This won't be\nmulti-lined"
 nullValue: null
 numberString: "12345"
