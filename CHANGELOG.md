@@ -2,6 +2,8 @@
 
 Simple strings (scalars) are now output unquoted.
 
+Multi-line strings are now output as literal block scalars.
+
 Added:
   - encodeQuoted: Encodes with all keys/strings quoted
   - encodeQuotedDocuments: Encodes documents with all keys/strings quoted

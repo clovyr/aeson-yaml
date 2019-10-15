@@ -44,6 +44,9 @@ testCases =
    "off": "off",
    "piString": "3.14",
    "expString": "1e3",
+   "multiLine": "The first line is followed by the\nsecond line\n",
+   "multiLineWithSpaces": "  This has\nextra spaces at the beginning\n",
+   "notMultiline": "This won't be\nmulti-lined",
    "apiVersion": "apps/v1",
    "kind": "Deployment",
    "metadata": {
@@ -80,6 +83,7 @@ testCases =
                         "containerPort": 7654
                      }
                   ],
+                  "script": "#!/bin/bash\necho hello world\n",
                   "volumeMounts": [
                      {
                         "mountPath": "/data/mount1",
@@ -108,6 +112,13 @@ metadata:
   labels:
     app: foo
   name: "{{ .Release.Name }}-deployment"
+multiLine: |
+  The first line is followed by the
+  second line
+multiLineWithSpaces: |2
+    This has
+  extra spaces at the beginning
+notMultiline: "This won't be\nmulti-lined"
 nullValue: null
 numberString: "12345"
 "off": "off"
@@ -132,6 +143,9 @@ spec:
           name: "{{ .Release.Name }}-container"
           ports:
             - containerPort: 7654
+          script: |
+            #!/bin/bash
+            echo hello world
           volumeMounts:
             - mountPath: /data/mount1
               name: "{{ .Release.Name }}-volume-mount1"

@@ -93,14 +93,14 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
       intersperse prefix $
       map (encodeBuilder alwaysQuote False (level + 1)) (Vector.toList vec)
       where prefix = bs "\n" <> indent level <> bs "- "
-    String s -> encodeText alwaysQuote s
+    String s -> encodeText True alwaysQuote level s
     Number n -> bl (enc n)
     Bool bool -> bl (enc bool)
     Null -> bs "null"
   where
     keyValue level' (k, v) =
       mconcat
-        [ encodeText alwaysQuote k
+        [ encodeText False alwaysQuote level k
         , ":"
         , case v of
             Object _ -> ""
@@ -109,8 +109,9 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
         , encodeBuilder alwaysQuote True (level' + 1) v
         ]
 
-encodeText :: Bool -> Text -> Builder
-encodeText alwaysQuote s
+encodeText :: Bool -> Bool -> Int -> Text -> Builder
+encodeText canMultiline alwaysQuote level s
+  | canMultiline && "\n" `Text.isSuffixOf` s = encodeLines level (Text.lines s)
   | alwaysQuote || not unquotable = bl $ enc s
   | otherwise = b (Text.Encoding.encodeUtf8 s)
   where
@@ -140,3 +141,23 @@ encodeText alwaysQuote s
     isAllowed c
       -- We don't include ' ' here to avoid sequences like " -" and ": "
      = isSafeAscii c || c == '-' || c == ':'
+
+encodeLines :: Int -> [Text] -> Builder
+encodeLines level ls =
+  mconcat $
+  (prefix :) $
+  intersperse (bs "\n" <> indent level) $ map (b . Text.Encoding.encodeUtf8) ls
+  where
+    prefix =
+      mconcat
+        [ bs "|"
+        , if needsIndicator
+            then bs "2"
+            else mempty
+        , "\n"
+        , indent level
+        ]
+    needsIndicator =
+      case ls of
+        (line:_) -> " " `Text.isPrefixOf` line
+        _ -> False
