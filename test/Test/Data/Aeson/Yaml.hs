@@ -158,8 +158,8 @@ spec:
       { tcName = "Quoted"
       , tcInput = [s|{"foo": "bar", "baz": "quux"}|]
       , tcOutput =
-          [s|"baz": "quux"
-"foo": "bar"
+          [s|"baz": 'quux'
+"foo": 'bar'
 |]
       , tcAlwaysQuote = True
       }

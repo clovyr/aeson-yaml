@@ -114,6 +114,8 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
 encodeText :: Bool -> Bool -> Int -> Text -> Builder
 encodeText canMultiline alwaysQuote level s
   | canMultiline && "\n" `Text.isSuffixOf` s = encodeLines level (Text.lines s)
+  | alwaysQuote && unquotable =
+    bs "'" <> b (Text.Encoding.encodeUtf8 s) <> bs "'"
   | alwaysQuote || not unquotable = bl $ Data.Aeson.encode s
   | otherwise = b (Text.Encoding.encodeUtf8 s)
   where
