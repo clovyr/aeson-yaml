@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3.0 - 2019-11-03
+
+### Fixed
+
+  - Encode empty lists as "[]" rather than "\n -"
+
 ## 1.0.2.0 - 2019-10-15
 
 ### Changed

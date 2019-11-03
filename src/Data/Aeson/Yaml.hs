@@ -90,10 +90,14 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
       intersperse prefix $ map (keyValue level) (sortOn fst $ HashMap.toList hm)
       where prefix = bs "\n" <> indent level
     Array vec ->
-      mconcat $
-      (prefix :) $
-      intersperse prefix $
-      map (encodeBuilder alwaysQuote False (level + 1)) (Vector.toList vec)
+      if Vector.null vec
+        then bs " []"
+        else mconcat $
+             (prefix :) $
+             intersperse prefix $
+             map
+               (encodeBuilder alwaysQuote False (level + 1))
+               (Vector.toList vec)
       where prefix = bs "\n" <> indent level <> bs "- "
     String s -> encodeText True alwaysQuote level s
     Number n -> bl (Data.Aeson.encode n)

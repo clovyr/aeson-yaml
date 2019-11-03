@@ -46,6 +46,8 @@ testCases =
    "multiLine": "The first line is followed by the\nsecond line\n",
    "multiLineWithSpaces": "         This has extra\n     spaces at the beginning\n",
    "notMultiline": "This won't be\nmulti-lined",
+   "list": ["foo", "bar", "baz"],
+   "listEmpty": [],
    "apiVersion": "apps/v1",
    "kind": "Deployment",
    "metadata": {
@@ -107,6 +109,11 @@ expString: "1e3"
 isFalse: false
 isTrue: true
 kind: Deployment
+list:
+  - foo
+  - bar
+  - baz
+listEmpty: []
 metadata:
   labels:
     app: foo
