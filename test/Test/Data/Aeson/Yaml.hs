@@ -29,11 +29,14 @@ data TestCase =
     }
 
 testCases :: [TestCase]
-testCases =
-  [ TestCase
-      { tcName = "Nested lists and objects"
-      , tcInput =
-          [s|
+testCases = [tcDataTypes, tcNestedListsAndObjects, tcQuoted]
+
+tcDataTypes :: TestCase
+tcDataTypes =
+  TestCase
+    { tcName = "Data types"
+    , tcInput =
+        [s|
 {
    "nullValue": null,
    "isTrue": true,
@@ -41,13 +44,51 @@ testCases =
    "numberString": "12345",
    "quoted ! key": true,
    "boolString": "true",
+   "dateString": "2038-01-19",
    "piString": "3.14",
    "expString": "1e3",
+   "asteriskString": "*",
    "multiLine": "The first line is followed by the\nsecond line\n",
    "multiLineWithSpaces": "         This has extra\n     spaces at the beginning\n",
    "notMultiline": "This won't be\nmulti-lined",
    "list": ["foo", "bar", "baz"],
-   "listEmpty": [],
+   "listEmpty": []
+}
+|]
+    , tcOutput =
+        [s|asteriskString: "*"
+boolString: "true"
+dateString: "2038-01-19"
+expString: "1e3"
+isFalse: false
+isTrue: true
+list:
+  - foo
+  - bar
+  - baz
+listEmpty: []
+multiLine: |
+  The first line is followed by the
+  second line
+multiLineWithSpaces: |2
+           This has extra
+       spaces at the beginning
+notMultiline: "This won't be\nmulti-lined"
+nullValue: null
+numberString: "12345"
+piString: "3.14"
+"quoted ! key": true
+|]
+    , tcAlwaysQuote = False
+    }
+
+tcNestedListsAndObjects :: TestCase
+tcNestedListsAndObjects =
+  TestCase
+    { tcName = "Nested lists and objects"
+    , tcInput =
+        [s|
+{
    "apiVersion": "apps/v1",
    "kind": "Deployment",
    "metadata": {
@@ -102,33 +143,13 @@ testCases =
    }
 }
 |]
-      , tcOutput =
-          [s|apiVersion: apps/v1
-boolString: "true"
-expString: "1e3"
-isFalse: false
-isTrue: true
+    , tcOutput =
+        [s|apiVersion: apps/v1
 kind: Deployment
-list:
-  - foo
-  - bar
-  - baz
-listEmpty: []
 metadata:
   labels:
     app: foo
   name: "{{ .Release.Name }}-deployment"
-multiLine: |
-  The first line is followed by the
-  second line
-multiLineWithSpaces: |2
-           This has extra
-       spaces at the beginning
-notMultiline: "This won't be\nmulti-lined"
-nullValue: null
-numberString: "12345"
-piString: "3.14"
-"quoted ! key": true
 spec:
   replicas: 1
   selector:
@@ -157,18 +178,20 @@ spec:
             - mountPath: /data/mount2
               name: "{{ .Release.Name }}-volume-mount2"
 |]
-      , tcAlwaysQuote = False
-      }
-  , TestCase
-      { tcName = "Quoted"
-      , tcInput = [s|{"foo": "bar", "baz": "quux"}|]
-      , tcOutput =
-          [s|'baz': 'quux'
+    , tcAlwaysQuote = False
+    }
+
+tcQuoted :: TestCase
+tcQuoted =
+  TestCase
+    { tcName = "Quoted"
+    , tcInput = [s|{"foo": "bar", "baz": "quux"}|]
+    , tcOutput =
+        [s|'baz': 'quux'
 'foo': 'bar'
 |]
-      , tcAlwaysQuote = True
-      }
-  ]
+    , tcAlwaysQuote = True
+    }
 
 foo :: Data.Aeson.Value
 foo = Data.Aeson.Object $ HashMap.fromList [("foo", "bar")]
