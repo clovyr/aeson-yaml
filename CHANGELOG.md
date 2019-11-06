@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4.0 - 2019-11-06
+
+### Fixed
+
+  - Quote date strings (e.g. "2038-01-19")
+
 ## 1.0.3.0 - 2019-11-03
 
 ### Fixed
