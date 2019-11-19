@@ -91,7 +91,7 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
       where prefix = bs "\n" <> indent level
     Array vec ->
       if Vector.null vec
-        then bs " []"
+        then bs "[]"
         else mconcat $
              (prefix :) $
              intersperse prefix $
@@ -110,7 +110,7 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
         , ":"
         , case v of
             Object _ -> ""
-            Array _ -> ""
+            Array xs | not (null xs) -> ""
             _ -> " "
         , encodeBuilder alwaysQuote True (level' + 1) v
         ]
