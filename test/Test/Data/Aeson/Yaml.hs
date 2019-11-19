@@ -29,7 +29,16 @@ data TestCase =
     }
 
 testCases :: [TestCase]
-testCases = [tcDataTypes, tcNestedListsAndObjects, tcQuoted]
+testCases = [tcDataTypes, tcNestedListsAndObjects, tcQuoted, tcEmptyList]
+
+tcEmptyList :: TestCase
+tcEmptyList = 
+  TestCase
+    { tcName = "Empty root list"
+    , tcInput = "[]"
+    , tcOutput = "[]\n"
+    , tcAlwaysQuote = False
+    }
 
 tcDataTypes :: TestCase
 tcDataTypes =
