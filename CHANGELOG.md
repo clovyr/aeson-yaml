@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5.0 - 2019-11-30
+
+### Fixed
+
+  - Encode empty objects as "{}" rather than ""
+
 ## 1.0.4.0 - 2019-11-06
 
 ### Fixed

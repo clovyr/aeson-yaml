@@ -48,6 +48,7 @@ tcDataTypes =
         [s|
 {
    "nullValue": null,
+   "emptyObject": {},
    "isTrue": true,
    "isFalse": false,
    "numberString": "12345",
@@ -68,6 +69,7 @@ tcDataTypes =
         [s|asteriskString: "*"
 boolString: "true"
 dateString: "2038-01-19"
+emptyObject: {}
 expString: "1e3"
 isFalse: false
 isTrue: true

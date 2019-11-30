@@ -82,22 +82,23 @@ encodeQuotedDocuments vs =
 encodeBuilder :: Bool -> Bool -> Int -> Data.Aeson.Value -> Builder
 encodeBuilder alwaysQuote newlineBeforeObject level value =
   case value of
-    Object hm ->
-      mconcat $
-      (if newlineBeforeObject
-         then (prefix :)
-         else id) $
-      intersperse prefix $ map (keyValue level) (sortOn fst $ HashMap.toList hm)
+    Object hm
+      | null hm -> bs "{}"
+      | otherwise ->
+        mconcat $
+        (if newlineBeforeObject
+           then (prefix :)
+           else id) $
+        intersperse prefix $
+        map (keyValue level) (sortOn fst $ HashMap.toList hm)
       where prefix = bs "\n" <> indent level
-    Array vec ->
-      if Vector.null vec
-        then bs "[]"
-        else mconcat $
-             (prefix :) $
-             intersperse prefix $
-             map
-               (encodeBuilder alwaysQuote False (level + 1))
-               (Vector.toList vec)
+    Array vec
+      | null vec -> bs "[]"
+      | otherwise ->
+        mconcat $
+        (prefix :) $
+        intersperse prefix $
+        map (encodeBuilder alwaysQuote False (level + 1)) (Vector.toList vec)
       where prefix = bs "\n" <> indent level <> bs "- "
     String s -> encodeText True alwaysQuote level s
     Number n -> bl (Data.Aeson.encode n)
@@ -109,8 +110,10 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
         [ encodeText False alwaysQuote level k
         , ":"
         , case v of
-            Object _ -> ""
-            Array xs | not (null xs) -> ""
+            Object hm
+              | not (null hm) -> ""
+            Array vec
+              | not (null vec) -> ""
             _ -> " "
         , encodeBuilder alwaysQuote True (level' + 1) v
         ]
