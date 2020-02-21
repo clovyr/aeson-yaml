@@ -24,7 +24,7 @@ import Data.ByteString.Builder (Builder)
 import qualified Data.ByteString.Builder as ByteString.Builder
 import qualified Data.ByteString.Lazy as ByteString.Lazy
 import qualified Data.ByteString.Short as ByteString.Short
-import Data.Char (isDigit)
+import Data.Char (isAlpha, isDigit)
 import qualified Data.HashMap.Strict as HashMap
 import Data.List (intersperse, sortOn)
 import Data.Monoid ((<>), mconcat, mempty)
@@ -120,18 +120,28 @@ encodeBuilder alwaysQuote newlineBeforeObject level value =
 
 encodeText :: Bool -> Bool -> Int -> Text -> Builder
 encodeText canMultiline alwaysQuote level s
+  -- s is a value, not a map key, and contains newlines; can be inserted
+  -- literally with `|` syntax
   | canMultiline && "\n" `Text.isSuffixOf` s = encodeLines level (Text.lines s)
-  | alwaysQuote && unquotable =
-    bs "'" <> b (Text.Encoding.encodeUtf8 s) <> bs "'"
+  -- s is a number, date, or boolString; single-quote
+  | Text.all isNumberOrDateRelated s || isBoolString = singleQuote
+  -- s should be quoted, AND s is not unsafe; single-quote
+  | alwaysQuote && unquotable = singleQuote
+  -- s should be quoted, OR s might be unsafe; double-quote
   | alwaysQuote || not unquotable = bl $ Data.Aeson.encode s
-  | otherwise = b (Text.Encoding.encodeUtf8 s)
+  -- otherwise; no quotes
+  | otherwise = noQuote
   where
-    unquotable =
-      s /= "" &&
-      not isSpecial &&
-      isSafeAscii (Text.head s) &&
-      not (Text.all isNumberOrDateRelated s) && Text.all isAllowed s
-    isSpecial
+    noQuote = b (Text.Encoding.encodeUtf8 s)
+    singleQuote = bs "'" <> noQuote <> bs "'"
+    headS = Text.head s
+    unquotable -- s is unquotable if all are True
+     =
+      s /= "" && -- s is not empty
+      Text.all isAllowed s && -- s consists of acceptable chars
+      (Data.Char.isAlpha headS || -- head of s is a char in A-Z or a-z or indicates a filepath
+       headS == '/')
+    isBoolString
       | Text.length s > 5 = False
       | otherwise =
         case Text.toLower s of
@@ -143,9 +153,7 @@ encodeText canMultiline alwaysQuote level s
       (c >= 'A' && c <= 'Z') ||
       (c >= '0' && c <= '9') || c == '/' || c == '_' || c == '.' || c == '='
     isNumberOrDateRelated c = isDigit c || c == '.' || c == 'e' || c == '-'
-    isAllowed c
-      -- We don't include ' ' here to avoid sequences like " -" and ": "
-     = isSafeAscii c || c == '-' || c == ':'
+    isAllowed c = isSafeAscii c || c == '-' || c == ':' || c == ' '
 
 encodeLines :: Int -> [Text] -> Builder
 encodeLines level ls =

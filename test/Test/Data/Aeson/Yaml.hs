@@ -28,7 +28,8 @@ data TestCase = TestCase
   }
 
 testCases :: [TestCase]
-testCases = [tcDataTypes, tcNestedListsAndObjects, tcQuoted, tcEmptyList]
+testCases =
+  [tcDataTypes, tcNestedListsAndObjects, tcQuoted, tcEmptyList, tcHelloWorld]
 
 tcEmptyList :: TestCase
 tcEmptyList =
@@ -56,6 +57,8 @@ tcDataTypes =
    "dateString": "2038-01-19",
    "piString": "3.14",
    "expString": "1e3",
+   "leadingSpace" : " leading space",
+   "leadingSymbol" : "!leading symbol",
    "asteriskString": "*",
    "multiLine": "The first line is followed by the\nsecond line\n",
    "multiLineWithSpaces": "         This has extra\n     spaces at the beginning\n",
@@ -66,12 +69,14 @@ tcDataTypes =
 |]
     , tcOutput =
         [s|asteriskString: "*"
-boolString: "true"
-dateString: "2038-01-19"
+boolString: 'true'
+dateString: '2038-01-19'
 emptyObject: {}
-expString: "1e3"
+expString: '1e3'
 isFalse: false
 isTrue: true
+leadingSpace: " leading space"
+leadingSymbol: "!leading symbol"
 list:
   - foo
   - bar
@@ -85,8 +90,8 @@ multiLineWithSpaces: |2
        spaces at the beginning
 notMultiline: "This won't be\nmulti-lined"
 nullValue: null
-numberString: "12345"
-piString: "3.14"
+numberString: '12345'
+piString: '3.14'
 "quoted ! key": true
 |]
     , tcAlwaysQuote = False
@@ -201,6 +206,39 @@ tcQuoted =
 'foo': 'bar'
 |]
     , tcAlwaysQuote = True
+    }
+
+tcHelloWorld :: TestCase
+tcHelloWorld =
+  TestCase
+    { tcName = "Hello World"
+    , tcInput =
+        [s|
+{ "image": "node 10.15.3"
+, "pipelines":
+  { "default":
+    [ { "step":
+        { "caches": []
+        , "name": "hello world"
+        , "script": [ "echo hello" ]
+        }
+      }
+    ]
+    
+  }
+}
+|]
+    , tcOutput =
+        [s|image: node 10.15.3
+pipelines:
+  default:
+    - step:
+        caches: []
+        name: hello world
+        script:
+          - echo hello
+|]
+    , tcAlwaysQuote = False
     }
 
 foo :: Data.Aeson.Value
