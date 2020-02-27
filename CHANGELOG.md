@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.6.0 - 2020-02-27
+
+### Changed
+
+  - Don't quote simple strings containing spaces, e.g: hello world
+
+  - Single-quote dates (like '2020-02-27') and bools ('true' / 'false')
+
 ## 1.0.5.0 - 2019-11-30
 
 ### Fixed
