@@ -1,7 +1,7 @@
 cabal-version: 1.12
 
 name:           aeson-yaml
-version:        1.0.5.0
+version:        1.0.6.0
 homepage:       https://github.com/clovyr/aeson-yaml
 bug-reports:    https://github.com/clovyr/aeson-yaml/issues
 author:         Patrick Nielsen
