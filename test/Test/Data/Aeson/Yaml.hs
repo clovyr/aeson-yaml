@@ -20,12 +20,13 @@ import Test.Tasty.HUnit (assertEqual, testCase)
 
 import Data.Aeson.Yaml
 
-data TestCase = TestCase
-  { tcName :: String
-  , tcInput :: Data.ByteString.Lazy.ByteString
-  , tcOutput :: Data.ByteString.Lazy.ByteString
-  , tcAlwaysQuote :: Bool
-  }
+data TestCase =
+  TestCase
+    { tcName :: String
+    , tcInput :: Data.ByteString.Lazy.ByteString
+    , tcOutput :: Data.ByteString.Lazy.ByteString
+    , tcAlwaysQuote :: Bool
+    }
 
 testCases :: [TestCase]
 testCases =
