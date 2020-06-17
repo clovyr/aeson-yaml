@@ -52,15 +52,15 @@ encode v =
   ByteString.Builder.toLazyByteString $
   encodeBuilder False False 0 (toJSON v) <> bs "\n"
 
--- | Encode multiple values separated by '\n---\n'. To encode values of different
+-- | Encode multiple values prefixed by @---\n@. To encode values of different
 -- types, @import Data.Aeson(ToJSON(toJSON))@ and do
 -- @encodeDocuments [toJSON x, toJSON y, toJSON z]@.
 encodeDocuments :: ToJSON a => [a] -> ByteString.Lazy.ByteString
-encodeDocuments vs = ByteString.Builder.toLazyByteString $ output <> bs "\n"
+encodeDocuments vs =
+    ByteString.Builder.toLazyByteString (foldMap encodeDocument vs)
   where
-    output =
-      mconcat $
-      intersperse (bs "\n---\n") $ map (encodeBuilder False False 0 . toJSON) vs
+    encodeDocument document =
+        "---\n" <> encodeBuilder False False 0 (toJSON document) <> "\n"
 
 -- | Encode a value as YAML (lazy bytestring). Keys and strings are always
 -- quoted.
@@ -73,11 +73,10 @@ encodeQuoted v =
 -- quoted.
 encodeQuotedDocuments :: ToJSON a => [a] -> ByteString.Lazy.ByteString
 encodeQuotedDocuments vs =
-  ByteString.Builder.toLazyByteString $ output <> bs "\n"
+    ByteString.Builder.toLazyByteString (foldMap encodeDocument vs)
   where
-    output =
-      mconcat $
-      intersperse (bs "\n---\n") $ map (encodeBuilder True False 0 . toJSON) vs
+    encodeDocument document =
+        "---\n" <> encodeBuilder True False 0 (toJSON document) <> "\n"
 
 encodeBuilder :: Bool -> Bool -> Int -> Data.Aeson.Value -> Builder
 encodeBuilder alwaysQuote newlineBeforeObject level value =
