@@ -258,11 +258,11 @@ test_testCases = testGroup "Test Cases" $ map mkTestCase testCases
         if tcAlwaysQuote
           then assertEqual
                  "Expected documents output"
-                 ("'foo': 'bar'" <> "\n---\n" <> output)
+                 ("---\n'foo': 'bar'" <> "\n---\n" <> output)
                  (encodeQuotedDocuments [foo, decodedInput])
           else assertEqual
                  "Expected documents output"
-                 ("foo: bar" <> "\n---\n" <> output)
+                 ("---\nfoo: bar" <> "\n---\n" <> output)
                  (encodeDocuments [foo, decodedInput])
       where
         output =
