@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0.0 - 2020-06-25
+
+### Changed
+
+  - Every change to the YAML output format will now result in a bump of B
+    in A.B.C.D to more closely follow the Haskell PVP. B will be bumped in
+    case of small changes and bug fixes, and A if a change is expected to
+    cause problems with common YAML 1.1 or 1.2 decoders.
+  - `encodeDocuments` and `encodeQuotedDocuments` now output a leading `---`
+
 ## 1.0.6.0 - 2020-02-27
 
 ### Changed
