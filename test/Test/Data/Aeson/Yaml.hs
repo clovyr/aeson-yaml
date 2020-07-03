@@ -30,7 +30,7 @@ data TestCase =
 
 testCases :: [TestCase]
 testCases =
-  [tcDataTypes, tcNestedListsAndObjects, tcQuoted, tcEmptyList, tcHelloWorld]
+  [tcDataTypes, tcNestedListsAndObjects, tcQuoted, tcNetworkQuote, tcEmptyList, tcHelloWorld]
 
 tcEmptyList :: TestCase
 tcEmptyList =
@@ -132,6 +132,7 @@ tcNestedListsAndObjects =
                {
                   "command": [
                      "/data/bin/foo",
+                     "/42",
                      "--port=7654"
                   ],
                   "image": "ubuntu:latest",
@@ -180,6 +181,7 @@ spec:
       containers:
         - command:
             - /data/bin/foo
+            - /42
             - "--port=7654"
           image: ubuntu:latest
           name: "{{ .Release.Name }}-container"
@@ -209,6 +211,24 @@ tcQuoted =
     , tcAlwaysQuote = True
     }
 
+tcNetworkQuote :: TestCase
+tcNetworkQuote =
+  TestCase
+    { tcName = "Network CIDR single quote"
+    , tcInput =
+        [s|
+{ "ip": "127.0.0.1"
+, "net": "127.0.0.1/8"
+}
+|]
+    , tcOutput =
+        [s|ip: '127.0.0.1'
+net: '127.0.0.1/8'
+|]
+    , tcAlwaysQuote = False
+    }
+
+
 tcHelloWorld :: TestCase
 tcHelloWorld =
   TestCase
@@ -225,7 +245,7 @@ tcHelloWorld =
         }
       }
     ]
-    
+
   }
 }
 |]
