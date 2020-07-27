@@ -59,29 +59,24 @@ tcDataTypes =
    "piString": "3.14",
    "expString": "1e3",
    "leadingSpace" : " leading space",
-   "trailingSpace" : "trailing space ",
-   "colon" : "colon:",
    "leadingSymbol" : "!leading symbol",
    "asteriskString": "*",
    "multiLine": "The first line is followed by the\nsecond line\n",
    "multiLineWithSpaces": "         This has extra\n     spaces at the beginning\n",
    "notMultiline": "This won't be\nmulti-lined",
    "list": ["foo", "bar", "baz"],
-   "listEmpty": [],
-   "e": null
+   "listEmpty": []
 }
 |]
     , tcOutput =
         [s|asteriskString: "*"
 boolString: 'true'
-colon: 'colon:'
 dateString: '2038-01-19'
-e: null
 emptyObject: {}
 expString: '1e3'
 isFalse: false
 isTrue: true
-leadingSpace: ' leading space'
+leadingSpace: " leading space"
 leadingSymbol: "!leading symbol"
 list:
   - foo
@@ -99,7 +94,6 @@ nullValue: null
 numberString: '12345'
 piString: '3.14'
 "quoted ! key": true
-trailingSpace: 'trailing space '
 |]
     , tcAlwaysQuote = False
     }
@@ -187,7 +181,7 @@ spec:
         - command:
             - /data/bin/foo
             - "--port=7654"
-          image: 'ubuntu:latest'
+          image: ubuntu:latest
           name: "{{ .Release.Name }}-container"
           ports:
             - containerPort: 7654
