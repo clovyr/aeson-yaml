@@ -122,24 +122,38 @@ encodeText canMultiline alwaysQuote level s
   -- s is a value, not a map key, and contains newlines; can be inserted
   -- literally with `|` syntax
   | canMultiline && "\n" `Text.isSuffixOf` s = encodeLines level (Text.lines s)
-  -- s is a number, date, or boolString; single-quote
-  | Text.all isNumberOrDateRelated s || isBoolString = singleQuote
-  -- s should be quoted, AND s is not unsafe; single-quote
-  | alwaysQuote && unquotable = singleQuote
+
+  | shouldSingleQuote = singleQuote
+
   -- s should be quoted, OR s might be unsafe; double-quote
   | alwaysQuote || not unquotable = bl $ Data.Aeson.encode s
+
   -- otherwise; no quotes
   | otherwise = noQuote
   where
     noQuote = b (Text.Encoding.encodeUtf8 s)
+
+    shouldSingleQuote =
+            (Text.all isNumberOrDateRelated s && Text.any isDigit s)
+        ||  isBoolString
+        ||  Text.isPrefixOf " " s
+        ||  Text.isSuffixOf " " s
+            -- Quote if the string looks like a key
+        ||  Text.isInfixOf ":" s
+            -- s should be quoted, AND s is not unsafe; single-quote
+        ||  (alwaysQuote && unquotable)
+
     singleQuote = bs "'" <> noQuote <> bs "'"
+
     headS = Text.head s
+
     unquotable -- s is unquotable if all are True
      =
       s /= "" && -- s is not empty
       Text.all isAllowed s && -- s consists of acceptable chars
       (Data.Char.isAlpha headS || -- head of s is a char in A-Z or a-z or indicates a filepath
        headS == '/')
+
     isBoolString
       | Text.length s > 5 = False
       | otherwise =
@@ -147,11 +161,14 @@ encodeText canMultiline alwaysQuote level s
           "true" -> True
           "false" -> True
           _ -> False
+
     isSafeAscii c =
       (c >= 'a' && c <= 'z') ||
       (c >= 'A' && c <= 'Z') ||
       (c >= '0' && c <= '9') || c == '/' || c == '_' || c == '.' || c == '='
+
     isNumberOrDateRelated c = isDigit c || c == '.' || c == 'e' || c == '-'
+
     isAllowed c = isSafeAscii c || c == '-' || c == ':' || c == ' '
 
 encodeLines :: Int -> [Text] -> Builder
