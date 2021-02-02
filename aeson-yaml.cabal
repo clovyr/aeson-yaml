@@ -61,10 +61,10 @@ test-suite test
     -- , hedgehog-gen-json
     , string-qq
     , tasty
-    , tasty-discover
     , tasty-hunit
     , unordered-containers
     , yaml
+  build-tool-depends: tasty-discover:tasty-discover
   type: exitcode-stdio-1.0
   default-language: Haskell2010
 
