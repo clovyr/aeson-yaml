@@ -215,7 +215,7 @@ tcHelloWorld =
     { tcName = "Hello World"
     , tcInput =
         [s|
-{ "image": "node 10.15.3"
+{ "image": "node: 10.15.3"
 , "pipelines":
   { "default":
     [ { "step":
@@ -230,7 +230,7 @@ tcHelloWorld =
 }
 |]
     , tcOutput =
-        [s|image: node 10.15.3
+        [s|image: "node: 10.15.3"
 pipelines:
   default:
     - step:
