@@ -139,7 +139,8 @@ encodeText canMultiline alwaysQuote level s
       s /= "" && -- s is not empty
       Text.all isAllowed s && -- s consists of acceptable chars
       (Data.Char.isAlpha headS || -- head of s is a char in A-Z or a-z or indicates a filepath
-       headS == '/')
+       headS == '/') &&
+       not (Text.isInfixOf ": " s) -- s contains a mapping separator
     isBoolString
       | Text.length s > 5 = False
       | otherwise =
