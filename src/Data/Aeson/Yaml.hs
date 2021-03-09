@@ -158,8 +158,14 @@ encodeLines :: Int -> [Text] -> Builder
 encodeLines level ls =
   mconcat $
   (prefix :) $
-  intersperse (bs "\n" <> indent level) $ map (b . Text.Encoding.encodeUtf8) ls
+  intersperseOn (/= "") (bs "\n" <> indent level) (bs "\n") $ map Text.Encoding.encodeUtf8 ls
   where
+    intersperseOn _ _ _ [] = []
+    intersperseOn cond thenClause elseClause (x:xs) = b x : map go xs
+      where
+        go x'
+          | cond x' = thenClause <> b x'
+          | otherwise = elseClause <> b x'
     prefix =
       mconcat
         [ bs "|"

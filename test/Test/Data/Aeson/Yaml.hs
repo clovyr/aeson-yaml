@@ -62,6 +62,7 @@ tcDataTypes =
    "leadingSymbol" : "!leading symbol",
    "asteriskString": "*",
    "multiLine": "The first line is followed by the\nsecond line\n",
+   "multiLineWithEmptyLines": "The first line is followed by an empty line\n\nthird line\n",
    "multiLineWithSpaces": "         This has extra\n     spaces at the beginning\n",
    "notMultiline": "This won't be\nmulti-lined",
    "list": ["foo", "bar", "baz"],
@@ -86,6 +87,10 @@ listEmpty: []
 multiLine: |
   The first line is followed by the
   second line
+multiLineWithEmptyLines: |
+  The first line is followed by an empty line
+
+  third line
 multiLineWithSpaces: |2
            This has extra
        spaces at the beginning
