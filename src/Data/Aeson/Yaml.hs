@@ -8,6 +8,7 @@ libyaml. It is also licensed under the BSD3 license.
 
 This module is meant to be imported qualified.
 -}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Data.Aeson.Yaml
@@ -25,13 +26,21 @@ import qualified Data.ByteString.Builder as ByteString.Builder
 import qualified Data.ByteString.Lazy as ByteString.Lazy
 import qualified Data.ByteString.Short as ByteString.Short
 import Data.Char (isAlpha, isDigit)
-import qualified Data.HashMap.Strict as HashMap
-import Data.List (intersperse, sortOn)
+import Data.List (intersperse)
 import Data.Monoid ((<>), mconcat, mempty)
 import qualified Data.Text as Text
 import Data.Text (Text)
 import qualified Data.Text.Encoding as Text.Encoding
 import qualified Data.Vector as Vector
+
+#if MIN_VERSION_aeson(2,0,0)
+import qualified Data.Aeson.Key as Key
+import qualified Data.Aeson.KeyMap as KeyMap
+import Data.Bifunctor (first)
+#else
+import qualified Data.HashMap.Strict as HashMap
+import Data.List (sortOn)
+#endif
 
 b :: ByteString -> Builder
 b = ByteString.Builder.byteString
@@ -81,15 +90,15 @@ encodeQuotedDocuments vs =
 encodeBuilder :: Bool -> Bool -> Int -> Data.Aeson.Value -> Builder
 encodeBuilder alwaysQuote newlineBeforeObject level value =
   case value of
-    Object hm
-      | null hm -> bs "{}"
+    Object km
+      | null km -> bs "{}"
       | otherwise ->
         mconcat $
         (if newlineBeforeObject
            then (prefix :)
            else id) $
         intersperse prefix $
-        map (keyValue level) (sortOn fst $ HashMap.toList hm)
+        map (keyValue level) (objectToAscList km)
       where prefix = bs "\n" <> indent level
     Array vec
       | null vec -> bs "[]"
@@ -173,3 +182,10 @@ encodeLines level ls =
       case ls of
         (line:_) -> " " `Text.isPrefixOf` line
         _ -> False
+
+objectToAscList :: Object -> [(Text, Value)]
+#if MIN_VERSION_aeson(2,0,0)
+objectToAscList = map (first Key.toText) . KeyMap.toAscList
+#else
+objectToAscList = sortOn fst . HashMap.toList
+#endif

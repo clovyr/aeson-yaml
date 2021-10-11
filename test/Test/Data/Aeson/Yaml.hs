@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE QuasiQuotes #-}
@@ -7,9 +8,14 @@ module Test.Data.Aeson.Yaml where
 import qualified Data.Aeson
 import qualified Data.ByteString.Lazy
 import Data.Either (fromRight)
-import qualified Data.HashMap.Strict as HashMap
 import Data.String.QQ (s)
 import qualified Data.Yaml
+
+#if MIN_VERSION_aeson(2,0,0)
+import qualified Data.Aeson.KeyMap as KeyMap
+#else
+import qualified Data.HashMap.Strict as HashMap
+#endif
 
 -- import Hedgehog
 -- import Hedgehog.Gen
@@ -243,7 +249,14 @@ pipelines:
     }
 
 foo :: Data.Aeson.Value
-foo = Data.Aeson.Object $ HashMap.fromList [("foo", "bar")]
+foo =
+  Data.Aeson.Object $
+#if MIN_VERSION_aeson(2,0,0)
+    KeyMap.fromList
+#else
+    HashMap.fromList
+#endif
+      [("foo", "bar")]
 
 test_testCases :: TestTree
 test_testCases = testGroup "Test Cases" $ map mkTestCase testCases
