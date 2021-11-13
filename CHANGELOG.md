@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0.1 - 2021-11-13
+
+### Changed
+
+  - Support aeson-2.0 (thanks to Simon Jakobi)
+
 ## 1.1.0.0 - 2020-06-25
 
 ### Changed
