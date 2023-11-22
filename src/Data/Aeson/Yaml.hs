@@ -133,6 +133,8 @@ encodeText canMultiline alwaysQuote level s
   | canMultiline && "\n" `Text.isSuffixOf` s = encodeLines level (Text.lines s)
   -- s is a number, date, or boolString; single-quote
   | Text.all isNumberOrDateRelated s || isBoolString = singleQuote
+  -- s is a cird; single-quote
+  | isDigit headS && Text.all isCIDR tailS = singleQuote
   -- s should be quoted, AND s is not unsafe; single-quote
   | alwaysQuote && unquotable = singleQuote
   -- s should be quoted, OR s might be unsafe; double-quote
@@ -143,6 +145,7 @@ encodeText canMultiline alwaysQuote level s
     noQuote = b (Text.Encoding.encodeUtf8 s)
     singleQuote = bs "'" <> noQuote <> bs "'"
     headS = Text.head s
+    tailS = Text.tail s
     unquotable -- s is unquotable if all are True
      =
       s /= "" && -- s is not empty
@@ -161,6 +164,7 @@ encodeText canMultiline alwaysQuote level s
       (c >= 'A' && c <= 'Z') ||
       (c >= '0' && c <= '9') || c == '/' || c == '_' || c == '.' || c == '='
     isNumberOrDateRelated c = isDigit c || c == '.' || c == 'e' || c == '-'
+    isCIDR c = isDigit c || c == '.' || c == '/'
     isAllowed c = isSafeAscii c || c == '-' || c == ':' || c == ' '
 
 encodeLines :: Int -> [Text] -> Builder
